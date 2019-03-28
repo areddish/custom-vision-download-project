@@ -5,8 +5,8 @@ Example how to download the data in a custom vision project.
 
 ## Install Python
 
-*[Python](https://www.python.org/downloads/)
-*[Pip](https://pip.pypa.io/en/stable/installing/)
+* [Python](https://www.python.org/downloads/)
+* [Pip](https://pip.pypa.io/en/stable/installing/)
 
 ## Get the Custom Vision SDK
 ```
