@@ -7,10 +7,10 @@ import sys
 import requests
 import argparse
 
-def download_image(uri, location):
+def download_image(uri, name):
     req = requests.get(uri, stream=True)
     if req.status_code == 200:
-        with open(location+i.id, 'wb') as image_file:
+        with open(name, 'wb') as image_file:
             for chunk in req.iter_content(1024):
                 image_file.write(chunk)
     else:
@@ -28,13 +28,16 @@ def download_images(trainer, project_id, location):
         images = trainer.get_tagged_images(project_id, take=count_to_download, skip=downloaded)
         for i in images:
             print ("Downloading", i.id, i.original_image_uri)
-            download_image(i.original_image_uri, location)
+            download_image(i.original_image_uri, location+i.id)
             print ("Creating meta data for: ", i.id)
             with open(location+i.id+".metadata", 'wt') as image_file:
+                print ("Tag Name, Tag Id", file=image_file)
                 for t in i.tags:
-                    print("Tag:", t.tag_name, t.tag_id, , file = image_file)
-                for r in i.regions:
-                    print ("Region:", r.region_id, r.tag_id, r.left, r.top, r.width, r.height, file = image_file)
+                    print(t.tag_name, ",", t.tag_id, file=image_file)
+                if i.regions:
+                    print("Region Id, Tag Id, Left, Top, Width, Height", file=image_file)
+                    for r in i.regions:
+                        print (r.region_id, ",", r.tag_id, ",", r.left, ",", r.top, ",", r.width, ",", r.height, file=image_file)
                 
         downloaded += count_to_download
         count -= count_to_download
@@ -46,10 +49,10 @@ def download_images(trainer, project_id, location):
     while(count > 0):
         count_to_download = min(count, 50)
         print ("Getting", count_to_download, "images")
-        images = trainer.get_untagged_images(project_id, take=count_to_download, skip=migrated)
+        images = trainer.get_untagged_images(project_id, take=count_to_download, skip=downloaded)
         for i in images:
             print ("Downloading", i.id, i.original_image_uri)
-            download_image(i.original_image_uri, location)
+            download_image(i.original_image_uri, location+i.id)
         downloaded += count_to_download
         count -= count_to_download
 
